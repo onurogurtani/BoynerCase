@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Repository\MongoDb\IMongoDb.cs" />
+    <Compile Remove="Repository\IRepository.cs" />
+    <Compile Remove="Repository\EntityBase.cs" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,92 @@
+version: '3.4'
+
+services: 
+  boynercase.elastic:
+    image: boynercaseelastic
+    container_name: boynercaseelastic
+    hostname: boynercaseelastic
+    build:
+      context: .
+      dockerfile: BoynerCase.Elastic/Dockerfile
+    links:
+      - rabbitmq
+    ports:
+      - 8088:8088
+    environment: 
+      - UserName = guest
+      - Password = guest
+      - HostName = rabbitmq
+      - Port = 5672
+      - VirtualHost = /    
+
+  boynercase.api.product:
+    image: boynercaseapiproduct
+    container_name: boynercaseapiproduct
+    hostname: boynercaseapiproduct
+    build:
+      context: .
+      dockerfile: BoynerCase.Api.Product/Dockerfile
+    links:
+      - rabbitmq
+    ports:
+      - 8085:8085
+
+  boynercase.mongo:
+    image: boynercasemongo
+    container_name: boynercasemongo
+    hostname: boynercasemongo
+    build:
+      context: .
+      dockerfile: BoynerCase.Mongo/Dockerfile
+    links:
+      - rabbitmq
+      - mongo
+    ports:
+      - 8086:8086
+
+  rabbitmq:
+    image: rabbitmq:3.6.6-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment: 
+      - RABBITMQ_DEFAULT_USER = user
+      - RABBITMQ_DEFAULT_PASS = user
+
+  mongo:
+    image: mongo
+    hostname: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    ports:
+        - "27017"
+
+  mongo-express:
+    image: mongo-express
+    hostname: mongo-express
+    links:
+        - mongo:mongo
+    ports:
+        - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+
+  elasticsearch:
+    image: elasticsearch
+    container_name: elasticsearch
+    environment:
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - discovery.type=single-node
+    ports:
+      - 9200:9200
+
+  kibana:
+    image: kibana
+    container_name: kibana
+    links:
+      - "elasticsearch"
+    ports:
+      - 5601:5601
